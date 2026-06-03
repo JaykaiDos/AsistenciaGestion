@@ -1,0 +1,209 @@
+<div class="administrar-container">
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="fas fa-users-cog"></i>
+      Administrar Matrícula
+    </h2>
+    <p class="page-subtitle">Gestiona los alumnos matriculados en la institución</p>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  <div class="alert alert-success" *ngIf="mostrarExito">
+    <i class="fas fa-check-circle"></i>
+    <strong>{{ mensajeExito }}</strong>
+  </div>
+
+  <div class="admin-grid">
+    <!-- Panel de Alta de Alumnos -->
+    <div class="card form-panel">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-user-plus"></i>
+          Registrar Nuevo Alumno
+        </h3>
+      </div>
+      <div class="card-body">
+        <form class="registro-form">
+          <div class="form-group">
+            <label for="nombre" class="form-label">
+              <i class="fas fa-user"></i>
+              Nombre Completo *
+            </label>
+            <input 
+              type="text" 
+              id="nombre" 
+              class="form-control" 
+              placeholder="Ej: García López, María Fernanda"
+              [(ngModel)]="nombreNuevo"
+              name="nombre"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="curso" class="form-label">
+              <i class="fas fa-chalkboard"></i>
+              Curso *
+            </label>
+            <select 
+              id="curso" 
+              class="form-control" 
+              [(ngModel)]="cursoSeleccionado"
+              name="curso"
+              required>
+              <option value="">Seleccione un curso</option>
+              <option *ngFor="let curso of cursos" [value]="curso.value">
+                {{ curso.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <i class="fas fa-envelope"></i>
+              Correo Electrónico
+            </label>
+            <input 
+              type="email" 
+              id="email" 
+              class="form-control" 
+              placeholder="estudiante@ejemplo.com"
+              [(ngModel)]="emailNuevo"
+              name="email">
+          </div>
+
+          <div class="form-group">
+            <label for="telefono" class="form-label">
+              <i class="fas fa-phone"></i>
+              Teléfono
+            </label>
+            <input 
+              type="tel" 
+              id="telefono" 
+              class="form-control" 
+              placeholder="+1 234 567 8900"
+              [(ngModel)]="telefonoNuevo"
+              name="telefono">
+          </div>
+
+          <button 
+            type="button" 
+            class="btn btn-primary btn-block"
+            [disabled]="!nombreNuevo.trim() || !cursoSeleccionado"
+            (click)="registrarAlumno()">
+            <i class="fas fa-save"></i>
+            Registrar Alumno
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabla de Administración -->
+    <div class="card table-panel">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-list"></i>
+          Listado de Alumnos
+          <span class="badge">{{ alumnos.length }}</span>
+        </h3>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-outline" (click)="cargarDatosPrueba()">
+            <i class="fas fa-database"></i>
+            Cargar Datos
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="limpiarBaseDatos()">
+            <i class="fas fa-trash-alt"></i>
+            Limpiar BD
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre Completo</th>
+                <th>Curso</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let alumno of alumnosOrdenados; let i = index">
+                <td>
+                  <span class="numero-badge">{{ i + 1 }}</span>
+                </td>
+                <td>
+                  <span class="nombre-cell">{{ alumno.nombre }}</span>
+                </td>
+                <td>
+                  <span class="curso-badge">{{ getCursoLabel(alumno.curso) }}</span>
+                </td>
+                <td>
+                  <a [href]="'mailto:' + alumno.email" class="email-link">
+                    <i class="fas fa-envelope"></i>
+                    {{ alumno.email }}
+                  </a>
+                </td>
+                <td>
+                  <a [href]="'tel:' + alumno.telefono" class="telefono-link">
+                    <i class="fas fa-phone"></i>
+                    {{ alumno.telefono }}
+                  </a>
+                </td>
+                <td>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="eliminarAlumno(alumno.id)"
+                    title="Eliminar alumno">
+                    <i class="fas fa-trash-alt"></i>
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="alumnos.length === 0">
+                <td colspan="6" class="text-center">
+                  <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No hay alumnos registrados</p>
+                    <small>Utiliza el formulario para agregar uno nuevo</small>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Control de Datos -->
+  <div class="data-control-section">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-database"></i>
+          Gestión de Datos
+        </h3>
+      </div>
+      <div class="card-body">
+        <p class="data-info">
+          <i class="fas fa-info-circle"></i>
+          Utiliza estas opciones para gestionar la base de datos de alumnos. 
+          Los datos de prueba te ayudarán a visualizar el funcionamiento del sistema.
+        </p>
+        <div class="data-actions">
+          <button class="btn btn-outline" (click)="cargarDatosPrueba()">
+            <i class="fas fa-download"></i>
+            Cargar Datos de Prueba
+          </button>
+          <button class="btn btn-danger" (click)="limpiarBaseDatos()">
+            <i class="fas fa-eraser"></i>
+            Limpiar Base de Datos Local
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

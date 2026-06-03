@@ -1,0 +1,216 @@
+<div class="historial-container">
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="fas fa-history"></i>
+      Historial de Asistencia
+    </h2>
+    <p class="page-subtitle">Consulta y revisa los registros de asistencia tomados anteriormente</p>
+  </div>
+
+  <!-- Estadísticas Resumen -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon bg-success">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalPresentes() }}</div>
+        <div class="stat-label">Total Presentes</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-danger">
+        <i class="fas fa-times"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalAusentes() }}</div>
+        <div class="stat-label">Total Ausentes</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-primary">
+        <i class="fas fa-clipboard-list"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ registrosFiltrados.length }}</div>
+        <div class="stat-label">Registros</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card filter-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fas fa-filter"></i>
+        Filtros de Búsqueda
+      </h3>
+    </div>
+    <div class="card-body">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="fechaFiltro" class="filter-label">
+            <i class="fas fa-calendar-alt"></i>
+            Por Fecha
+          </label>
+          <input 
+            type="date" 
+            id="fechaFiltro" 
+            class="form-control" 
+            [(ngModel)]="fechaFiltro">
+        </div>
+
+        <div class="filter-group">
+          <label for="cursoFiltro" class="filter-label">
+            <i class="fas fa-chalkboard"></i>
+            Por Curso
+          </label>
+          <select 
+            id="cursoFiltro" 
+            class="form-control" 
+            [(ngModel)]="cursoFiltro">
+            <option value="">Todos los cursos</option>
+            <option *ngFor="let curso of cursos" [value]="curso.value">
+              {{ curso.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn btn-outline" (click)="fechaFiltro = ''; cursoFiltro = ''">
+            <i class="fas fa-times-circle"></i>
+            Limpiar Filtros
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="limpiarHistorial()">
+        <i class="fas fa-trash-alt"></i>
+        Limpiar Historial
+      </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Registros -->
+  <div class="card table-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fas fa-table"></i>
+        Registros Guardados
+      </h3>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Curso</th>
+              <th>Materia</th>
+              <th>Registrado Por</th>
+              <th>Hora</th>
+              <th>Asistencia</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let registro of registrosFiltrados">
+              <td>
+                <span class="fecha-badge">{{ registro.fecha }}</span>
+              </td>
+              <td>{{ registro.curso }}</td>
+              <td>{{ registro.materia }}</td>
+              <td>
+                <span class="email-cell">{{ registro.registradoPor }}</span>
+              </td>
+              <td>{{ registro.horaModificacion }}</td>
+              <td>
+                <span class="badge badge-success">{{ registro.presentes }} P</span>
+                <span class="badge badge-danger">{{ registro.ausentes }} A</span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="verDetalle(registro)">
+                  <i class="fas fa-eye"></i>
+                  Ver Detalle
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="registrosFiltrados.length === 0">
+              <td colspan="7" class="text-center">
+                <div class="empty-state">
+                  <i class="fas fa-inbox"></i>
+                  <p>No se encontraron registros con los filtros seleccionados</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalle -->
+  <div class="modal-overlay" [class.show]="mostrandoDetalle" (click)="cerrarDetalle()">
+    <div class="modal-content" [class.show]="mostrandoDetalle" (click)="$event.stopPropagation()">
+      <div class="modal-header" *ngIf="registroSeleccionado">
+        <h3 class="modal-title">
+          <i class="fas fa-clipboard-list"></i>
+          Detalle de Asistencia
+        </h3>
+        <button class="modal-close" (click)="cerrarDetalle()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="registroSeleccionado">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Fecha:</label>
+            <span>{{ registroSeleccionado.fecha }}</span>
+          </div>
+          <div class="info-item">
+            <label>Curso:</label>
+            <span>{{ registroSeleccionado.curso }}</span>
+          </div>
+          <div class="info-item">
+            <label>Materia:</label>
+            <span>{{ registroSeleccionado.materia }}</span>
+          </div>
+          <div class="info-item">
+            <label>Registrado por:</label>
+            <span>{{ registroSeleccionado.registradoPor }}</span>
+          </div>
+        </div>
+
+        <h4 class="lista-title">
+          <i class="fas fa-users"></i>
+          Lista de Alumnos
+          <span class="badge badge-success">{{ registroSeleccionado.presentes }}</span>
+          <span class="badge badge-danger">{{ registroSeleccionado.ausentes }}</span>
+        </h4>
+
+        <div class="lista-alumnos">
+          <div *ngFor="let alumno of registroSeleccionado.alumnos" 
+               class="alumno-detalle"
+               [class]="getEstadoClass(alumno.estado)">
+            <span class="alumno-nombre">{{ alumno.nombre }}</span>
+            <span class="alumno-estado">
+              <i [class]="alumno.estado === 'Presente' ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+              {{ alumno.estado }}
+            </span>
+          </div>
+          <div *ngIf="registroSeleccionado.alumnos.length === 0" class="sin-datos">
+            <i class="fas fa-info-circle"></i>
+            <p>No hay alumnos registrados para este ejemplo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cerrarDetalle()">
+          <i class="fas fa-arrow-left"></i>
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

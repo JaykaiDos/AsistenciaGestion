@@ -1,0 +1,52 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen" id="sidebar">
+    <div class="sidebar-header">
+      <h3 class="sidebar-title">
+        <i class="fas fa-graduation-cap"></i>
+        Control Asistencia
+      </h3>
+      <button class="close-sidebar" (click)="toggleSidebar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/registrar-asistencia" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
+        <i class="fas fa-clipboard-check nav-icon"></i>
+        <span>Registrar Asistencia</span>
+      </a>
+      <a routerLink="/historial" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
+        <i class="fas fa-history nav-icon"></i>
+        <span>Historial</span>
+      </a>
+      <a routerLink="/administrar-matricula" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
+        <i class="fas fa-users-cog nav-icon"></i>
+        <span>Administrar Matrícula</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p class="copyright">© {{ currentYear }} - Institución Educativa</p>
+    </div>
+  </aside>
+
+  <!-- Overlay para móvil -->
+  <div class="sidebar-overlay" [class.show]="sidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="navbar-title">Control de Asistencia Escolar</h1>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
